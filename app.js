@@ -368,18 +368,19 @@ async function handleAuthState(user){
     }
 }
 
-/* Main init sequence */
+/* Main init sequence — DEBUG VERSION */
 (async()=>{
     try{
         await initDemoData();
     }catch(err){
-        if(isConfigErr(err)){showSetupScreen();return;}
-        /* If seeding fails for non-config reasons, still show login */
-        console.warn('Seed warning:',err.message);
+        const msg=err.message||err.code||String(err);
+        /* Show error right on the login screen */
+        const box=document.querySelector('.demo-box');
+        if(box)box.innerHTML='<p style="color:#f87171;font-weight:600">Firebase Error:</p><p style="color:#fca5a5;font-size:.8rem;word-break:break-all">'+msg+'</p><p style="color:#f87171;font-size:.8rem;margin-top:.5rem">Code: '+(err.code||'none')+'</p>';
+        console.error('SEED ERROR:',err);
+        if(isConfigErr(err))return;
     }
-    /* Register auth listener AFTER seeding completes */
     auth.onAuthStateChanged(handleAuthState);
-    /* Safety net: if user was already signed in from a previous session,
-       onAuthStateChanged fires once with that user — but just in case: */
     if(auth.currentUser)await handleAuthState(auth.currentUser);
+
 })();
