@@ -12,7 +12,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyATe35VBqDOioLdU6OPBTv3_pTfGNjV_1s",
     authDomain: "gym-management-system-646e7.firebaseapp.com",
     projectId: "gym-management-system-646e7",
-    storageBucket: "gym-management-system-646e7.firebasestorage.app",
+   storageBucket: "gym-management-system-646e7.appspot.com",
     messagingSenderId: "352464054004",
     appId: "1:352464054004:web:94118d435cabf1fd9820a1"
 };
