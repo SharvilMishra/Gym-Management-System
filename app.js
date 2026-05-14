@@ -368,19 +368,12 @@ async function handleAuthState(user){
     }
 }
 
-/* Main init sequence — DEBUG VERSION */
+/* Main init sequence */
 (async()=>{
-    try{
-        await initDemoData();
-    }catch(err){
-        const msg=err.message||err.code||String(err);
-        /* Show error right on the login screen */
-        const box=document.querySelector('.demo-box');
-        if(box)box.innerHTML='<p style="color:#f87171;font-weight:600">Firebase Error:</p><p style="color:#fca5a5;font-size:.8rem;word-break:break-all">'+msg+'</p><p style="color:#f87171;font-size:.8rem;margin-top:.5rem">Code: '+(err.code||'none')+'</p>';
-        console.error('SEED ERROR:',err);
-        if(isConfigErr(err))return;
+    try{await initDemoData();}catch(err){
+        console.error('Seed error:',err);
+        if(isConfigErr(err)){showSetupScreen(err.message);return;}
     }
     auth.onAuthStateChanged(handleAuthState);
     if(auth.currentUser)await handleAuthState(auth.currentUser);
-
 })();
