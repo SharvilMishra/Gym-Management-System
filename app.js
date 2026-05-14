@@ -159,10 +159,19 @@ async function handleLogin(e){
     e.preventDefault();
     const email=$('#loginEmail').value.trim(),pass=$('#loginPass').value;
     if(!email||!pass){toast('Enter email and password','warn');return;}
-    try{await auth.signInWithEmailAndPassword(email,pass);}
-    catch(err){
-        const m={'auth/user-not-found':'No account with this email','auth/wrong-password':'Incorrect password','auth/invalid-credential':'Invalid email or password','auth/too-many-requests':'Too many attempts — wait a moment','auth/invalid-email':'Enter a valid email','auth/network-request-failed':'Network error — check connection'};
-        toast(m[err.code]||'Login failed: '+err.message,'err');
+    try{
+        const cred=await auth.signInWithEmailAndPassword(email,pass);
+        curUser=cred.user;
+        curUserDoc=await getUserDoc(cred.user.uid);
+        if(!curUserDoc){
+            const seed=SEED_USERS.find(u=>u.email===email);
+            curUserDoc={role:seed?seed.role:'member',name:seed?seed.name:email.split('@')[0],email:email};
+            try{await db.collection('users').doc(cred.user.uid).set(curUserDoc);}catch(e2){}
+        }
+        showApp();
+    }catch(err){
+        const m={'auth/user-not-found':'No account — seeding may have failed','auth/wrong-password':'Wrong password','auth/invalid-credential':'Invalid email or password','auth/too-many-requests':'Too many attempts — wait','auth/invalid-email':'Enter a valid email','auth/network-request-failed':'Network error'};
+        toast(m[err.code]||'Login: '+err.message,'err');
     }
 }
 async function handleLogout(){await auth.signOut();curUser=null;curUserDoc=null;$('#app').classList.add('hidden');$('#loginScreen').classList.remove('hidden');$('#loginEmail').value='';$('#loginPass').value='';destroyCharts();}
